@@ -1,4 +1,4 @@
-import { VERIFICATION_EMAIL_TEMPLATE } from "./emailTemplates.js";
+import { PASSWORD_RESET_REQUEST_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE , PASSWORD_RESET_SUCCESS_TEMPLATE} from "./emailTemplates.js";
 import { mailtrapClient, sender } from "./mailtrap.config.js";
 
 export const sendVerificationEmail = async (email, verificationToken) => {
@@ -28,7 +28,7 @@ export const sendWelcomeEmail = async (email, name) => {
         const response = await mailtrapClient.send({
             from: sender,
             to: recipient,
-            template_uuid: "454b5b22-e15d-4d36-8711-1d9dee741e26",
+            template_uuid: "5c693371-b2af-4099-9a5e-852fe87b8f3c",
             template_variables: {
                 "company_info_name": "Auth Company",
                 "name": name,
@@ -40,5 +40,42 @@ export const sendWelcomeEmail = async (email, name) => {
         console.error("Error sending welcome email: ", error);
         throw new Error("Error sending welcome email: " + error);
     }
+};
+
+export const sendPasswordResetEmail = async (email, resetURL) => {
+    const recipient = [{email}];
+
+    try{
+        const response = await mailtrapClient.send({
+            from: sender,
+            to: recipient,
+            subject: "Password Reset Request",
+            html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL}", resetURL),
+            category: "Password Reset",
+        })
+    } catch (error) {
+        console.error('Error sending password reset email: ', error);
+        throw new Error(`Error sending password reset email: ${error.message || error}`);
+
+    }
+};
+
+export const sendPasswordResetSuccessEmail = async (email) => {
+    const recipient = [{email}];
+
+    try{
+        const response = await mailtrapClient.send({
+            from: sender,
+            to: recipient,
+            subject: "Password Reset Successful",
+            html: PASSWORD_RESET_SUCCESS_TEMPLATE,
+            category: "Password Reset",
+        });
+
+        console.log("Password reset success email sent successfully: ", response);
+    } catch (error) {
+        console.error("Error sending password reset success email:", error);
+        throw new Error(`Error sending password reset success email: ${error.message || error}`);
+      }
 };
     
