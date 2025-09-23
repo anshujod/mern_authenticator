@@ -20,15 +20,17 @@ app.use(express.json()); // allows us to parse incoming requests:req.body
 app.use(cookieParser()); // allows us to parse incoming cookies
 
 // Auth routes
-app.use("/api/auth", authRoutes);
-
 if (process.env.NODE_ENV === "production") {
-	app.use(express.static(path.join(__dirname, "/frontend/dist")));
+  app.use(express.static(path.join(__dirname, "frontend/dist")));
 
-	app.get("*", (req, res) => {
-		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-	});
+  // Catch-all route for React Router
+// For handling frontend routes (React/Vue/Angular SPA etc.)
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
+});
 }
+
+
 
 // Start server
 app.listen(PORT, () => {
